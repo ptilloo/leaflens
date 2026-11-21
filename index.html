@@ -80,6 +80,24 @@
   .hypothesis p { margin: 0 0 10px; }
   .hypothesis ul { margin: 0 0 10px; padding-left: 20px; }
   .hypothesis li { margin-bottom: 4px; }
+  .creator-pill {
+    display: inline-block; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; font-size: .95rem;
+    color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(185,246,202,.5); backdrop-filter: blur(4px);
+  }
+  .creator-pill b { color: #b9f6ca; }
+  .creator-pill .dot { margin: 0 6px; opacity: .7; }
+  .scientist {
+    display: flex; gap: 16px; align-items: flex-start; margin-top: 16px; padding: 18px 20px; border-radius: 14px;
+    background: linear-gradient(135deg, #fffde7, #f1f8e9); border: 2px solid #f9a825; box-shadow: 0 8px 28px rgba(0,0,0,.25);
+  }
+  .scientist .avatar {
+    flex: 0 0 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem; background: linear-gradient(135deg, #2e7d32, #00a3a3);
+  }
+  .scientist .kicker { font-size: .75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #e65100; }
+  .scientist .name { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+  .scientist .class { font-size: .95rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  .scientist p { margin: 0; line-height: 1.5; }
   .fineprint { margin-top: 24px; text-align: center; font-size: .78rem; color: var(--muted); line-height: 1.5; }
   .fineprint a { color: var(--muted); }
   @media (max-width: 560px) { .cams { grid-template-columns: 1fr; } }
@@ -89,6 +107,7 @@
 <main>
   <h1>🍃 LeafLens <span class="ai">AI</span></h1>
   <p class="tagline">🤖 Every leaf tells a story — let Artificial Intelligence read it.</p>
+  <div class="creator-pill">👨‍🔬 A Science Project by <b>Dheer Tilloo</b> <span class="dot">•</span> Class 8 'A'</div>
   <p class="sub">Hold a plant leaf in front of your camera and press <b>Capture &amp; Check</b> to find out if your plant is healthy.</p>
 
   <section class="hypothesis">
@@ -136,7 +155,21 @@
     <div class="bars" id="bars"></div>
   </section>
 
+  <section class="scientist">
+    <div class="avatar">🧑‍🔬</div>
+    <div>
+      <div class="kicker">Meet the Young Scientist</div>
+      <div class="name">Dheer Tilloo</div>
+      <div class="class">Class 8 'A'</div>
+      <p>
+        Dheer came up with the idea for LeafLens, collected and sorted the leaf photos, and trained the AI model
+        to recognise healthy and unhealthy leaves.
+      </p>
+    </div>
+  </section>
+
   <footer class="fineprint">
+    © 2026 Dheer Tilloo, Class 8 'A' · Science Project<br>
     Under the hood: the AI model powering LeafLens was trained and built using
     <a href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener">Google's Teachable Machine</a>,
     and runs right in your browser.<br>
