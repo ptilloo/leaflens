@@ -146,6 +146,7 @@
       <button id="startBtn">Start Camera</button>
       <button id="captureBtn" disabled>📸 Capture &amp; Check</button>
       <button id="liveBtn" class="secondary" disabled>Live mode: OFF</button>
+      <button id="flipBtn" class="secondary" disabled hidden>🔄 Flip Camera</button>
     </div>
     <div id="status"></div>
   </section>
@@ -185,6 +186,46 @@
 
   let model, webcam, maxPredictions;
   let liveMode = false;
+  let switching = false;
+
+  // Flip Camera is only offered on phones/tablets (not laptops)
+  const isMobile = navigator.userAgentData?.mobile ||
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1); // iPadOS
+  // On mobile start with the back camera (best for photographing leaves)
+  let facing = isMobile ? "environment" : "user";
+
+  async function openCamera() {
+    // Mirror the picture only for the selfie (front) camera
+    const cam = new tmImage.Webcam(300, 300, facing === "user");
+    await cam.setup({ facingMode: facing });
+    await cam.play();
+    webcam = cam;
+    $("webcam-box").innerHTML = "";
+    $("webcam-box").appendChild(webcam.canvas);
+  }
+
+  async function flipCamera() {
+    if (switching) return;
+    switching = true;
+    $("flipBtn").disabled = true;
+    const previous = facing;
+    try {
+      webcam.stop();
+      facing = facing === "user" ? "environment" : "user";
+      setStatus("Switching camera…");
+      await openCamera();
+      setStatus(facing === "environment" ? "Back camera on. Point it at a leaf." : "Front camera on.");
+    } catch (err) {
+      console.error(err);
+      facing = previous;
+      setStatus("Could not switch camera: " + err.message);
+      try { await openCamera(); } catch (e) {}
+    } finally {
+      switching = false;
+      $("flipBtn").disabled = false;
+    }
+  }
 
   const $ = (id) => document.getElementById(id);
   const setStatus = (msg) => { $("status").textContent = msg; };
@@ -198,14 +239,11 @@
       maxPredictions = model.getTotalClasses();
 
       setStatus("Starting camera… (allow camera access if asked)");
-      webcam = new tmImage.Webcam(300, 300, true); // width, height, flip (mirror)
-      await webcam.setup();
-      await webcam.play();
-      $("webcam-box").innerHTML = "";
-      $("webcam-box").appendChild(webcam.canvas);
+      await openCamera();
 
       $("captureBtn").disabled = false;
       $("liveBtn").disabled = false;
+      if (isMobile) $("flipBtn").disabled = false;
       $("startBtn").textContent = "Camera On";
       setStatus("Ready. Point the camera at a leaf.");
       window.requestAnimationFrame(loop);
@@ -217,8 +255,10 @@
   }
 
   async function loop() {
-    webcam.update();
-    if (liveMode) await predict(webcam.canvas);
+    if (!switching) {
+      webcam.update();
+      if (liveMode) await predict(webcam.canvas);
+    }
     window.requestAnimationFrame(loop);
   }
 
@@ -262,6 +302,8 @@
 
   $("startBtn").addEventListener("click", start);
   $("captureBtn").addEventListener("click", captureAndCheck);
+  if (isMobile) $("flipBtn").hidden = false;
+  $("flipBtn").addEventListener("click", flipCamera);
   $("liveBtn").addEventListener("click", () => {
     liveMode = !liveMode;
     $("liveBtn").textContent = "Live mode: " + (liveMode ? "ON" : "OFF");
